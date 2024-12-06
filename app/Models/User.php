@@ -78,7 +78,7 @@ class User extends Authenticatable
     public  function places(): BelongsToMany
     {
 
-        return $this->belongsToMany(Restaurant::class);
+        return $this->belongsToMany(Place::class);
     }
 
     public function image(): MorphOne

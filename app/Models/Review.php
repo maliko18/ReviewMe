@@ -16,7 +16,7 @@ class Review extends Model
 
     public function place(): BelongsTo
     {
-        return $this->belongsTo(Restaurant::class);
+        return $this->belongsTo(Place::class);
     }
     public function user(): BelongsTo
     {
