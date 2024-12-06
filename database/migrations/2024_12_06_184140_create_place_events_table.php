@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Place;
-use App\Models\Review;
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,14 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviews', function (Blueprint $table) {
+        Schema::create('place_events', function (Blueprint $table) {
             $table->id();
-            $table->text('body');
-            $table->integer('rating');
+            $table->string('name');
+            $table->string('slug');
+            $table->text('description');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->json('meta')->nullable();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignIdFor(Place::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignIdFor(Review::class, 'parent_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
@@ -31,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviews');
+        Schema::dropIfExists('place_events');
     }
 };
