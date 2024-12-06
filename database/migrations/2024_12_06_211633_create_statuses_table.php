@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\StatusEnum;
+use App\Helpers\Helper;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,12 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('statuses', function (Blueprint $table) {
             $table->id();
-            $table->integer('name');
-            $table->integer('slug');
-            $table->integer('taggable_id');
-            $table->string('taggable_type');
+            $table->enum('type', Helper::getEnumClassValues(StatusEnum::class))->default('inactive');
+            $table->json('meta')->nullable();
+            $table->integer('statusable_id');
+            $table->string('statusable_type');
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('statuses');
     }
 };
