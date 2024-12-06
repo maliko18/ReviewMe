@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Place;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,12 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('place_user', function (Blueprint $table) {
             $table->id();
-            $table->integer('name');
-            $table->integer('slug');
-            $table->integer('taggable_id');
-            $table->string('taggable_type');
+            $table->foreignIdFor(Place::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->json('meta')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('place_user');
     }
 };
