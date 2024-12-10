@@ -2,10 +2,13 @@
 
 namespace App\Actions\Review;
 
+use App\Models\Review;
+
 class UpdateReview
 {
-    public function handle()
+    public function handle(Review $review,array $data): Review
     {
-        //TODO
+        $review->update($data);
+        return  $review->refresh();
     }
 }
