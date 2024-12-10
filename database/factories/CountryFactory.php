@@ -4,20 +4,25 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Country>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
  */
-class CountryFactory extends Factory
+class CategoryFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
+        $name = $this->faker->unique()->word(); // Génère un mot unique
+
         return [
-            //
+            'name' => $name,
+            'slug' => Str::slug($name), // Génère un slug basé sur le nom
+            'description' => $this->faker->sentence(), // Une description factice
+            'meta' => json_encode([
+                'meta_title' => $name,
+                'meta_description' => $this->faker->sentence(),
+            ]), // Métadonnées factices
+            'category_id' => null, // Pas de parent par défaut
         ];
     }
 }

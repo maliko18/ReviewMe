@@ -2,10 +2,12 @@
 
 namespace App\Actions\Place;
 
+use App\Models\Place;
+
 class GetPlace
 {
-    public function handle()
+    public function handle(Place $place): Place
     {
-        //TODO
+        return $place;
     }
 }

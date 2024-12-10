@@ -13,6 +13,7 @@ class Review extends Model
 {
     /** @use HasFactory<\Database\Factories\ReviewFactory> */
     use HasFactory;
+    protected $fillable = ['body', 'rating', 'meta', 'parent_id', 'user_id', 'place_id'];
 
     public function place(): BelongsTo
     {

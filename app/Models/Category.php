@@ -7,6 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    /** @use HasFactory<\Database\Factories\CategoryFactory> */
     use HasFactory;
+
+    /**
+     * Les attributs qui peuvent être remplis via l'attribution de masse.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'meta',
+        'category_id', // Si tu gères des sous-catégories
+    ];
+
+    /**
+     * Indiquer que le champ "meta" est un tableau JSON.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'meta' => 'array',
+    ];
 }
