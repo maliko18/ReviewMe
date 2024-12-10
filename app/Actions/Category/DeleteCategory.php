@@ -2,10 +2,12 @@
 
 namespace App\Actions\Category;
 
+use App\Models\Category;
+
 class DeleteCategory
 {
-    public function handle()
+    public function handle(Category $category)
     {
-        //TODO
+        return $category->delete();
     }
 }
