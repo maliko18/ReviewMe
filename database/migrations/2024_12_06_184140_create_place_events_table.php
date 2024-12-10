@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->text('description');
-            $table->dateTime('start_date');
+            $table->dateTime('start_date')->default(now());
             $table->dateTime('end_date');
             $table->json('meta')->nullable();
             $table->foreignIdFor(Place::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();

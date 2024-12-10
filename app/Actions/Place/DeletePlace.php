@@ -2,10 +2,12 @@
 
 namespace App\Actions\Place;
 
+use App\Models\Place;
+
 class DeletePlace
 {
-    public function handle()
+    public function handle(Place $place): ?bool
     {
-        //TODO
+        return $place->delete();
     }
 }
