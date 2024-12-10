@@ -12,7 +12,7 @@ class Place extends Model
 {
     /** @use HasFactory<\Database\Factories\PlaceFactory> */
     use HasFactory;
-    protected $fillable = ['name', 'description', 'address', 'phone', 'email', 'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'pinterest', 'tiktok', 'snapchat', 'whatsapp', 'telegram', 'viber', 'wechat', 'line', 'skype', 'whatsapp_business', 'google_map', 'latitude', 'longitude', 'status', 'user_id'];
+    protected $fillable = ['name', 'description', 'slug'];
 
 
     public function users(): BelongsToMany
@@ -28,6 +28,11 @@ class Place extends Model
     public function placeEvents(): HasMany
     {
         return $this->hasMany(PlaceEvent::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function images(): MorphMany
