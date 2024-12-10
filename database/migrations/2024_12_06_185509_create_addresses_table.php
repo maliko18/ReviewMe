@@ -22,8 +22,8 @@ return new class extends Migration
             $table->json('meta')->nullable();
             $table->integer('addressable_id');
             $table->string('addressable_type');
-            $table->foreignIdFor(City::class)->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignIdFor(Country::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignIdFor(City::class)->nullable()->constrained();
+            $table->foreignIdFor(Country::class)->constrained();
             $table->timestamps();
         });
     }

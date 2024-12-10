@@ -5,6 +5,7 @@ use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CountryController;
+use App\Http\Controllers\CityController;
 
 
 /*Route::get('/user', function (Request $request) {
@@ -33,3 +34,5 @@ Route::prefix('reviews')->name('reviews')->controller(ReviewController::class)->
 });
 
 Route::get('/countries', [CountryController::class, 'index']);
+Route::get('countries/{country}/cities', [CityController::class, 'index']);
+
