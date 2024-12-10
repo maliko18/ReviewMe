@@ -6,11 +6,14 @@ use App\Models\Place;
 use App\Models\User;
 use Illuminate\Support\Str;
 
-class CreatePlace
+class UpdateOrCreatePlace
 {
-    public function handle( User $user, array $data):Place
+    public function handle( array $data):Place
     {
         $data['slug']=Str::of($data['name'])->snake()->toString();
-        return $user->places()->create($data);
+        return Place::query()->updateOrCreate(
+            ['id' => $data['id'] ?? null],
+            $data
+        );
     }
 }

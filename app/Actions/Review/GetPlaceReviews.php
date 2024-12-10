@@ -2,10 +2,13 @@
 
 namespace App\Actions\Review;
 
+use App\Models\Place;
+use Illuminate\Database\Eloquent\Collection;
+
 class GetPlaceReviews
 {
-    public function handle()
+    public function handle(Place $place): Collection
     {
-        //TODO
+        return $place->reviews;
     }
 }

@@ -22,8 +22,10 @@ class StoreReviewRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rating' => 'required|integer|min:1|max:5',
             'body' => 'required|string',
+            'rating' => 'required|integer|min:1|max:5',
+            'images' => 'nullable|array',
+            'images.*' => 'required|file|mimes:jpg,jpeg,png|max:2048',
         ];
     }
 }
