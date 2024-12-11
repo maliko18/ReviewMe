@@ -10,8 +10,8 @@ class AttachAddressesToPlace
     {
         foreach ($addresses as $addressData) {
             $place->addresses()->updateOrCreate(
-                ['id' => $addressData['id'] ?? null], // Match by ID if provided
-                $addressData // Update or insert with this data
+                ['id' => $addressData['id'] ?? null],
+                $addressData
             );
         }
     }

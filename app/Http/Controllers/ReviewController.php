@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Actions\Review\CreateReview;
 use App\Http\Requests\Review\StoreReviewRequest;
-use App\Http\Resources\Review\ReviewResource;
 use App\Models\Place;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class ReviewController extends BaseController
 {
-    public function index()
+    public function index(Place $place, StoreReviewRequest $request)
     {
-        //TODO
+
     }
 
     public function show()
@@ -20,9 +19,10 @@ class ReviewController extends BaseController
         //TODO
     }
 
-    public function store(Place $place, StoreReviewRequest $request): ReviewResource
+    public function store(Place $place, StoreReviewRequest $request): RedirectResponse
     {
-        return ReviewResource::make((new CreateReview())->handle($place,$this->user , $request->validated()));
+        $review = (new CreateReview())->handle($place, $this->user, $request->validated());
+        return redirect()->route('places.show', $place->slug);
     }
 
     public function update()
