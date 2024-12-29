@@ -23,7 +23,7 @@ class Place extends Model
 
     public function addBanners(): HasMany
     {
-        return $this->hasMany(AddBanner::class);
+        return $this->hasMany(AdBanner::class);
     }
 
     public function placeEvents(): HasMany

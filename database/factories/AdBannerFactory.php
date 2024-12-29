@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AddBanner>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AdBanner>
  */
-class AddBannerFactory extends Factory
+class AdBannerFactory extends Factory
 {
     /**
      * Define the model's default state.
