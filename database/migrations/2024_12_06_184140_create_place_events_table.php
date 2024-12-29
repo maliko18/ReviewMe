@@ -15,7 +15,6 @@ return new class extends Migration
         Schema::create('place_events', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug');
             $table->text('description');
             $table->dateTime('start_date')->default(now());
             $table->dateTime('end_date');
