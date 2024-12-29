@@ -6,6 +6,7 @@ class UpdateAdBanner
 {
     public function handle()
     {
+
         //TODO
     }
 }
