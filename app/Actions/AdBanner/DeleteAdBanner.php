@@ -2,10 +2,12 @@
 
 namespace App\Actions\AdBanner;
 
+use App\Models\AdBanner;
+
 class DeleteAdBanner
 {
-    public function handle()
+    public function handle( AdBanner $adBanner): ?bool
     {
-        //TODO
+        return $adBanner->delete();
     }
 }

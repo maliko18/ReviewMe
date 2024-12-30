@@ -2,10 +2,12 @@
 
 namespace App\Actions\AdBanner;
 
+use App\Models\Place;
+
 class CreateAdBanner
 {
-    public function handle()
+    public function handle(Place $place,array $data)
     {
-        //TODO
+        return $place->adBanners()->create($data);
     }
 }
