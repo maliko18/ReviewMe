@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdBannerController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Http\Request;
@@ -21,6 +22,10 @@ Route::prefix('places')->name('places.')->controller(PlaceController::class)->gr
         Route::put('/', 'update');
         Route::delete('/', 'destroy');
         Route::post('/reviews', [ReviewController::class,'store']);
+        Route::prefix('/ad-banners')->controller(AdBannerController::class)->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+        });
     });
 
 
@@ -31,6 +36,13 @@ Route::prefix('reviews')->name('reviews')->controller(ReviewController::class)->
     Route::get('/{review}', 'show');
     Route::put('/{review}', 'update');
     Route::delete('/{review}', 'destroy');
+});
+
+Route::prefix('ad-banners')->name('ad-banners')->controller(AdBannerController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::get('/{ad-banner}', 'show');
+    Route::put('/{ad-banner}', 'update');
+    Route::delete('/{ad-banner}', 'destroy');
 });
 
 Route::get('/countries', [CountryController::class, 'index']);
