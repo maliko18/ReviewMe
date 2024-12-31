@@ -52,4 +52,10 @@ class Place extends Model
     }
 
 
+    public function adBanners(): HasMany
+    {
+        return $this->hasMany(AdBanner::class);
+    }
+
+
 }
