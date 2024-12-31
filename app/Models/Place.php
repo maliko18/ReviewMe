@@ -26,11 +26,6 @@ class Place extends Model
         return $this->hasMany(AdBanner::class);
     }
 
-    public function placeEvents(): HasMany
-    {
-        return $this->hasMany(PlaceEvent::class);
-    }
-
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -51,7 +46,10 @@ class Place extends Model
         return $this->belongsTo(User::class);
     }
 
-
+    public function placeEvents(): HasMany
+    {
+        return $this->hasMany(PlaceEvent::class);
+    }
     public function adBanners(): HasMany
     {
         return $this->hasMany(AdBanner::class);

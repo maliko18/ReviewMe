@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\PlaceEventController;
 
 
 /*Route::get('/user', function (Request $request) {
@@ -27,6 +28,7 @@ Route::prefix('places')->name('places.')->controller(PlaceController::class)->gr
             Route::get('/', 'index');
             Route::post('/', 'store');
         });
+        Route::post('/place-events', [PlaceEventController::class,'store']);
     });
 
 
@@ -54,4 +56,14 @@ Route::prefix('categories')->controller(CategoryController::class)->group(functi
     Route::delete('/{category}', 'destroy');
 
 });
+
+ Route::prefix('place-events')->name('place-events.')->controller(PlaceEventController::class)->group(function () {
+     Route::get('/',  'index');
+     Route::put('/{placeEvent}', 'update');
+     Route::delete('/{placeEvent}', 'destroy');
+     Route::get('/{placeEvent}', 'show');
+ });
+
+
+
 
