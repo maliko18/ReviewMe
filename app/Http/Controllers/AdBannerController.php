@@ -7,33 +7,66 @@ use App\Http\Requests\AdBanner\StoreAdBannerRequest;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Models\AdBanner;
+
+
 
 class AdBannerController extends Controller
 {
-    public function index()
+    public function index(Place $place): JsonResponse
     {
-        //TODO
-    }
+        $adBanners = $place->adBanners()->get();
 
-    public function store(Place $place, StoreAdBannerRequest $request): JsonResponse
-    {
         return response()->json([
-            'ad_banner' => (new CreateAdBanner())->handle($place, $request->validated())
+            'ad_banners' => $adBanners
         ]);
     }
 
-    public function show($id)
+    public function store(Place $place ,StoreAdBannerRequest $request ): JsonResponse
+
     {
-        //TODO
+        return response()->json([
+            'ad_banners' => (new CreateAdBanner())->handle($place, $request->validated())
+        ]);
+
     }
 
-    public function update(Request $request, $id)
+    public function show(Place $place, AdBanner $adBanner): JsonResponse
     {
-        //TODO
+        if ($adBanner->place_id !== $place->id) {
+            return response()->json(['error' => 'Bannière non trouvée pour ce lieu'], 404);
+        }
+
+        return response()->json([
+            'ad_banner' => $adBanner
+        ]);
     }
 
-    public function destroy($id)
+
+
+    public function update(Request $request, Place $place, AdBanner $adBanner): JsonResponse
     {
-        //TODO
+
+        if ($adBanner->place_id !== $place->id) {
+            return response()->json(['error' => 'Bannière non trouvée pour ce lieu'], 404);
+        }
+
+        return response()->json([
+            'ad_banner' => update($request->all()),
+            'message' => 'Bannière mise à jour avec succès'
+        ]);
+    }
+    public function destroy(Place $place, AdBanner $adBanner): JsonResponse
+    {
+        // Vérifier que la bannière appartient bien à ce lieu
+        if ($adBanner->place_id !== $place->id) {
+            return response()->json(['error' => 'Bannière non trouvée pour ce lieu'], 404);
+        }
+
+        $adBanner->delete();
+
+        return response()->json([
+            'message' => 'Bannière supprimée avec succès'
+        ]);
     }
 }

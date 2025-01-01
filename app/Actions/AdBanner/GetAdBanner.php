@@ -2,10 +2,14 @@
 
 namespace App\Actions\AdBanner;
 
+use App\Models\AdBanner;
+
 class GetAdBanner
 {
-    public function handle()
+
+    public function handle(int $id): ?AdBanner
     {
-        //TODO
+        return AdBanner::find($id);
     }
+
 }
