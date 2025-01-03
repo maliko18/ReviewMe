@@ -1,11 +1,15 @@
 <?php
 
 namespace App\Actions\AdBanner;
+use App\Models\AdBanner;
+use Illuminate\Database\Eloquent\Collection;
 
 class GetAllAdBanner
 {
-    public function handle()
+
+
+    public function handle(): Collection
     {
-        //TODO
+        return AdBanner::all();
     }
 }
