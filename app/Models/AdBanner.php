@@ -18,4 +18,14 @@ class AdBanner extends Model
         'end_date',
         'place_id'
     ];
+
+    public function place()
+    {
+        return $this->belongsTo(Place::class);
+    }
+
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
 }
