@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Place;
+use App\Services\PlaceService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -14,24 +15,28 @@ use Inertia\Response;
 
 class AdminPlaceController extends Controller
 {
+    protected PlaceService $placeService;
+
+    public function __construct(PlaceService $placeService)
+    {
+        $this->placeService = $placeService;
+    }
+
     public function index(): Response
     {
-        $places = Place::with(['images', 'categories', 'addresses.city.country'])
-            ->withCount(['reviews', 'placeEvents'])
-            ->latest()
-            ->paginate();
+        $places = $this->placeService->getPlacesWithFilters();
 
         return Inertia::render('Places/Index', [
-            'places' => $places
+            'places' => $places,
         ]);
     }
 
-    public function show(Place $place)
+    public function show(Place $place): Response
     {
-        $place->load(['images', 'categories', 'address.city.country', 'reviews.user']);
+        $place = $this->placeService->getPlaceDetails($place);
 
         return Inertia::render('Admin/Places/Show', [
-            'place' => $place
+            'place' => $place,
         ]);
     }
 
@@ -39,13 +44,13 @@ class AdminPlaceController extends Controller
     {
         $this->authorize('update', $place);
 
-        $place->load(['images', 'categories', 'address.city.country']);
+        $place = $this->placeService->loadPlaceForEdit($place);
 
         return Inertia::render('Admin/Places/Edit', [
             'place' => $place,
             'categories' => Category::all(),
             'cities' => City::all(),
-            'countries' => Country::all()
+            'countries' => Country::all(),
         ]);
     }
 
@@ -53,28 +58,7 @@ class AdminPlaceController extends Controller
     {
         $this->authorize('update', $place);
 
-        $validated = $request->validated();
-        $validated['slug'] = Str::slug($validated['name']);
-
-        $place->update($validated);
-        $place->categories()->sync($validated['categories']);
-
-        if ($place->addresses->first()) {
-            $place->addresses->first()->update($validated['address']);
-        } else {
-            $place->addresses()->create($validated['address']);
-        }
-
-        if (!empty($validated['deleted_images'])) {
-            $place->images()->whereIn('id', $validated['deleted_images'])->delete();
-        }
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('places', 'public');
-                $place->images()->create(['path' => $path]);
-            }
-        }
+        $this->placeService->updatePlace($place, $request);
 
         return redirect()->route('places.index')
             ->with('success', 'Place updated successfully.');
@@ -83,47 +67,29 @@ class AdminPlaceController extends Controller
     public function create(): Response
     {
         $this->authorize('create', Place::class);
-        $categories = Category::all();
-        $cities = City::all();
-        $countries = Country::all();
+
         return Inertia::render('Admin/Places/Create', [
-            'categories' => $categories,
-            'cities' => $cities,
-            'countries' => $countries
+            'categories' => Category::all(),
+            'cities' => City::all(),
+            'countries' => Country::all(),
         ]);
     }
 
     public function store(PlaceRequest $request)
     {
         $this->authorize('create', Place::class);
-        DB::transaction(function () use ($request) {
-            $validated = $request->validated();
-            $validated['slug'] = Str::slug($validated['name']);
-            $validated['user_id'] = auth()->id();
 
-            $place = Place::create($validated);
-            $place->users()->attach(auth()->id());
-            $place->categories()->attach($validated['categories']);
-            $place->address()->create($validated['address']);
+        $this->placeService->storePlace($request);
 
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('places', 'public');
-                    $place->images()->create(['path' => $path]);
-                }
-            }
-
-            return redirect()->route('admin.places.index')
-                ->with('success', 'Place created successfully.');
-        });
-
+        return redirect()->route('admin.places.index')
+            ->with('success', 'Place created successfully.');
     }
 
     public function destroy(Place $place)
     {
         $this->authorize('delete', $place);
 
-        $place->delete();
+        $this->placeService->deletePlace($place);
 
         return redirect()->route('admin.places.index')
             ->with('success', 'Place deleted successfully.');
