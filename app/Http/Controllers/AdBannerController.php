@@ -1,39 +1,96 @@
 <?php
+// app/Http/Controllers/AdBannerController.php
 
 namespace App\Http\Controllers;
 
-use App\Actions\AdBanner\CreateAdBanner;
-use App\Http\Requests\AdBanner\StoreAdBannerRequest;
+use App\Models\AdBanner;
 use App\Models\Place;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Inertia\Inertia;
+use Inertia\Response;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class AdBannerController extends Controller
 {
-    public function index()
+    public function index(): Response
     {
-        //TODO
-    }
+        $banners = QueryBuilder::for(AdBanner::class)
+            ->allowedFilters([
+                AllowedFilter::exact('place_id'),
+                AllowedFilter::exact('status'),
+                AllowedFilter::callback('search', fn($query, $value) => $query->where('title', 'like', "%{$value}%")
+                    ->orWhere('description', 'like', "%{$value}%")
+                ),
+                AllowedFilter::callback('date', function ($query, $value) {
+                    return match ($value) {
+                        'active' => $query->where('start_date', '<=', now())
+                            ->where('end_date', '>=', now()),
+                        'upcoming' => $query->where('start_date', '>', now()),
+                        'expired' => $query->where('end_date', '<', now()),
+                        default => $query
+                    };
+                })
+            ])
+            ->with('place')
+            ->latest('start_date')
+            ->paginate()
+            ->withQueryString();
 
-    public function store(Place $place, StoreAdBannerRequest $request): JsonResponse
-    {
-        return response()->json([
-            'ad_banner' => (new CreateAdBanner())->handle($place, $request->validated())
+        return Inertia::render('AdBanners/Index', [
+            'banners' => $banners,
+            'places' => auth()->user()->can('create ad_banners') ?
+                Place::select('id', 'name')->get() : []
         ]);
     }
 
-    public function show($id)
+    public function store(Request $request)
     {
-        //TODO
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'status' => 'required|boolean',
+            'place_id' => 'required|exists:places,id',
+            'meta' => 'nullable|json'
+        ]);
+
+        $place = Place::findOrFail($validated['place_id']);
+        $this->authorize('create', [AdBanner::class, $place]);
+
+        AdBanner::create($validated);
+
+        return redirect()->back()
+            ->with('success', 'Ad banner created successfully');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, AdBanner $banner)
     {
-        //TODO
+        $this->authorize('update', $banner);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'status' => 'required|boolean',
+            'meta' => 'nullable|json'
+        ]);
+
+        $banner->update($validated);
+
+        return redirect()->back()
+            ->with('success', 'Ad banner updated successfully');
     }
 
-    public function destroy($id)
+    public function destroy(AdBanner $banner)
     {
-        //TODO
+        $this->authorize('delete', $banner);
+
+        $banner->delete();
+
+        return redirect()->back()
+            ->with('success', 'Ad banner deleted successfully');
     }
 }

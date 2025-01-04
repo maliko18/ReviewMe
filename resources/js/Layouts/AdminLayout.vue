@@ -1,25 +1,40 @@
-<!-- resources/js/Layouts/AdminLayout.vue -->
-<template>
-    <div class="flex min-h-screen bg-gray-100">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-primary text-white">
-            <div class="p-6 text-lg font-bold">Admin Dashboard</div>
-            <nav>
-                <Link
-                    href="/admin/restaurants"
-                    class="block px-4 py-2 hover:bg-gray-700"
-                >
-                    Place Management
-                </Link>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="flex-1 p-6">
-            <slot />
-        </div>
-    </div>
-</template>
+// resources/js/Layouts/AdminLayout.vue
 <script setup>
-import {Link} from "@inertiajs/vue3";
+import { computed } from 'vue';
+import { Head } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
+
+const props = defineProps({
+    title: {
+        type: String,
+        required: false
+    },
+    description: {
+        type: String,
+        required: false
+    }
+});
+
+const pageTitle = computed(() => {
+    return props.title ? `${props.title} - Admin` : 'Admin Dashboard';
+});
 </script>
+
+<template>
+    <AppLayout>
+        <Head :title="pageTitle" />
+
+        <PageHeader v-if="title || description" :title="title" :description="description">
+            <template #actions>
+                <slot name="actions" />
+            </template>
+        </PageHeader>
+
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <slot />
+            </div>
+        </div>
+    </AppLayout>
+</template>

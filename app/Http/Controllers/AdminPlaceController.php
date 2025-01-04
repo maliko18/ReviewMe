@@ -7,11 +7,12 @@ use App\Models\Category;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Place;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class PlaceController extends Controller
+class AdminPlaceController extends Controller
 {
     public function index(): Response
     {
@@ -27,20 +28,20 @@ class PlaceController extends Controller
 
     public function show(Place $place)
     {
-        $place->load(['images', 'categories', 'addresses.city.country', 'reviews.user']);
+        $place->load(['images', 'categories', 'address.city.country', 'reviews.user']);
 
-        return Inertia::render('Places/Show', [
+        return Inertia::render('Admin/Places/Show', [
             'place' => $place
         ]);
     }
 
-    public function edit(Place $place)
+    public function edit(Place $place): Response
     {
         $this->authorize('update', $place);
 
-        $place->load(['images', 'categories', 'addresses.city.country']);
+        $place->load(['images', 'categories', 'address.city.country']);
 
-        return Inertia::render('Places/Edit', [
+        return Inertia::render('Admin/Places/Edit', [
             'place' => $place,
             'categories' => Category::all(),
             'cities' => City::all(),
@@ -82,35 +83,40 @@ class PlaceController extends Controller
     public function create(): Response
     {
         $this->authorize('create', Place::class);
-
-        return Inertia::render('Places/Create', [
-            'categories' => Category::all(),
-            'cities' => City::all(),
-            'countries' => Country::all()
+        $categories = Category::all();
+        $cities = City::all();
+        $countries = Country::all();
+        return Inertia::render('Admin/Places/Create', [
+            'categories' => $categories,
+            'cities' => $cities,
+            'countries' => $countries
         ]);
     }
 
     public function store(PlaceRequest $request)
     {
         $this->authorize('create', Place::class);
+        DB::transaction(function () use ($request) {
+            $validated = $request->validated();
+            $validated['slug'] = Str::slug($validated['name']);
+            $validated['user_id'] = auth()->id();
 
-        $validated = $request->validated();
-        $validated['slug'] = Str::slug($validated['name']);
-        $validated['user_id'] = auth()->id();
+            $place = Place::create($validated);
+            $place->users()->attach(auth()->id());
+            $place->categories()->attach($validated['categories']);
+            $place->address()->create($validated['address']);
 
-        $place = Place::create($validated);
-        $place->categories()->attach($validated['categories']);
-        $place->addresses()->create($validated['address']);
-
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $path = $image->store('places', 'public');
-                $place->images()->create(['path' => $path]);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('places', 'public');
+                    $place->images()->create(['path' => $path]);
+                }
             }
-        }
 
-        return redirect()->route('places.index')
-            ->with('success', 'Place created successfully.');
+            return redirect()->route('admin.places.index')
+                ->with('success', 'Place created successfully.');
+        });
+
     }
 
     public function destroy(Place $place)
@@ -119,7 +125,7 @@ class PlaceController extends Controller
 
         $place->delete();
 
-        return redirect()->route('places.index')
+        return redirect()->route('admin.places.index')
             ->with('success', 'Place deleted successfully.');
     }
 }
