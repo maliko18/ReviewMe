@@ -1,66 +1,54 @@
 <?php
-// app/Http/Controllers/CategoryController.php
 
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class CategoryController extends Controller
 {
+    protected CategoryService $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+
     public function index(): Response
     {
-        $categories = QueryBuilder::for(Category::class)
-            ->allowedFilters([
-                AllowedFilter::callback('search', fn($query, $value) => $query->where('name', 'like', "%{$value}%")
-                )
-            ])
-            ->withCount('places')
-            ->paginate()
-            ->withQueryString();
+        $categories = $this->categoryService->getCategories();
 
         return Inertia::render('Admin/Categories/Index', [
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $validated['slug'] = Str::slug($validated['name']);
-
-        Category::create($validated);
+        $this->categoryService->storeCategory($request->validated());
 
         return redirect()->back()->with('success', 'Category created successfully');
     }
 
-    public function update( Category $category,StoreCategoryRequest $request)
+    public function update(StoreCategoryRequest $request, Category $category): RedirectResponse
     {
-        $validated = $request->validated();
-
-        $validated['slug'] = Str::slug($validated['name']);
-
-        $category->update($validated);
+        $this->categoryService->updateCategory($category, $request->validated());
 
         return redirect()->back()->with('success', 'Category updated successfully');
     }
 
     public function destroy(Category $category): RedirectResponse
     {
-        if ($category->categories()->exists()) {
-            return redirect()->back()->with('error', 'Cannot delete category with subcategories');
+        try {
+            $this->categoryService->deleteCategory($category);
+
+            return redirect()->back()->with('success', 'Category deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        $category->delete();
-
-        return redirect()->back()->with('success', 'Category deleted successfully');
     }
 }
