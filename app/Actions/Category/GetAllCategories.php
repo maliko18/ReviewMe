@@ -2,10 +2,13 @@
 
 namespace App\Actions\Category;
 
+use App\Models\Category;
+use Illuminate\Database\Eloquent\Collection;
+
 class GetAllCategories
 {
-    public function handle()
+    public function handle(): Collection
     {
-        //TODO
+        return  Category::all();
     }
 }
