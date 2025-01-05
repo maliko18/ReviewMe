@@ -1,5 +1,6 @@
 <!-- resources/js/Pages/Place/Index.vue -->
 <template>
+
     <Head :title="'Best Restaurants in ' + location" />
 
     <MainLayout>
@@ -33,7 +34,7 @@
                 <!-- Place Cards -->
                 <div class="space-y-4">
                     <div
-                        v-for="place in sortedPlaces"
+                        v-for="place in paginatedPlaces"
                         :key="place.id"
                         class="bg-white rounded-lg shadow-sm overflow-hidden"
                     >
@@ -150,8 +151,8 @@
             <!-- Map -->
             <div class="w-1/3">
                 <div class="sticky top-4 bg-white rounded-lg shadow-sm p-4 h-[calc(100vh-6rem)]">
-                    <!-- Map implementation here -->
-                    <div class="w-full h-full bg-gray-100 rounded-lg"></div>
+                    <!-- Carte Leaflet -->
+                    <div id="map" class="w-full h-full bg-gray-100 rounded-lg"></div>
                 </div>
             </div>
         </div>
@@ -159,14 +160,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { Head, Link } from '@inertiajs/vue3'
-import MainLayout from '@/Layouts/MainLayout.vue'
+import { ref, computed, onMounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import MainLayout from '@/Layouts/MainLayout.vue';
 import {
     SlidersIcon,
     ChevronLeftIcon,
     ChevronRightIcon
-} from 'lucide-vue-next'
+} from 'lucide-vue-next';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const props = defineProps({
     places: {
@@ -181,56 +184,100 @@ const props = defineProps({
         type: Object,
         default: () => ({})
     }
-})
+});
 
 // State
-const sortBy = ref('rating')
-const currentPage = ref(1)
-const itemsPerPage = 10
+const sortBy = ref('rating');
+const currentPage = ref(1);
+const itemsPerPage = 10;
+const map = ref(null);
+const userPosition = ref(null);
 
 // Computed
 const sortedPlaces = computed(() => {
-    let sorted = [...props.places]
+    let sorted = [...props.places];
 
     switch (sortBy.value) {
         case 'price_asc':
-            return sorted.sort((a, b) => a.average_price - b.average_price)
+            return sorted.sort((a, b) => a.average_price - b.average_price);
         case 'price_desc':
-            return sorted.sort((a, b) => b.average_price - a.average_price)
+            return sorted.sort((a, b) => b.average_price - a.average_price);
         default:
-            return sorted.sort((a, b) => b.rating - a.rating)
+            return sorted.sort((a, b) => b.rating - a.rating);
     }
-})
+});
+
+const paginatedPlaces = computed(() => {
+    const start = (currentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return sortedPlaces.value.slice(start, end);
+});
 
 const totalPages = computed(() => {
-    return Math.ceil(props.places.length / itemsPerPage)
-})
+    return Math.ceil(props.places.length / itemsPerPage);
+});
 
 // Methods
 const toggleFilters = () => {
     // Implement filters modal/sidebar
-}
+};
 
 const getBadgeClass = (badge) => {
     switch (badge) {
         case 'MICHELIN':
-            return 'bg-red-50 text-red-700'
+            return 'bg-red-50 text-red-700';
         case 'INSIDER':
-            return 'bg-green-50 text-green-700'
+            return 'bg-green-50 text-green-700';
         default:
-            return 'bg-gray-50 text-gray-700'
+            return 'bg-gray-50 text-gray-700';
     }
-}
+};
 
 const previousImage = (place) => {
     if (place.currentImageIndex > 0) {
-        place.currentImageIndex--
+        place.currentImageIndex--;
     }
-}
+};
 
 const nextImage = (place) => {
     if (place.currentImageIndex < place.images.length - 1) {
-        place.currentImageIndex++
+        place.currentImageIndex++;
     }
-}
+};
+
+const initMap = () => {
+    map.value = L.map('map').setView([48.8566, 2.3522], 13); // Default to Paris
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map.value);
+};
+
+const locateUser = () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                userPosition.value = [latitude, longitude];
+                map.value.setView(userPosition.value, 15);
+
+                L.marker(userPosition.value)
+                    .addTo(map.value)
+                    .bindPopup('Vous êtes ici')
+                    .openPopup();
+            },
+            (error) => {
+                console.error('Erreur de géolocalisation :', error.message);
+                alert('Impossible d’obtenir votre position.');
+            }
+        );
+    } else {
+        alert('La géolocalisation n’est pas supportée par ce navigateur.');
+    }
+};
+
+onMounted(() => {
+    initMap();
+    locateUser();
+});
 </script>

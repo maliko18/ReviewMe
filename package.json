@@ -23,6 +23,7 @@
     "dependencies": {
         "@headlessui/vue": "^1.7.23",
         "date-fns": "^4.1.0",
+        "leaflet": "^1.9.4",
         "lodash": "^4.17.21",
         "lucide-react": "^0.469.0",
         "lucide-vue-next": "^0.469.0",
