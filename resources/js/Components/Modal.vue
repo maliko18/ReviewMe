@@ -65,7 +65,7 @@ const maxWidthClass = computed(() => {
                         leave-from="opacity-100 scale-100"
                         leave-to="opacity-0 scale-95"
                     >
-                        <DialogPanel :class="['w-full', maxWidthClass, 'bg-white rounded-lg overflow-hidden shadow-xl transform transition-all']">
+                        <DialogPanel :class="['w-[600px]'/* maxWidthClass*/, 'bg-white rounded-lg overflow-hidden shadow-xl transform transition-all']">
                             <slot />
                         </DialogPanel>
                     </TransitionChild>

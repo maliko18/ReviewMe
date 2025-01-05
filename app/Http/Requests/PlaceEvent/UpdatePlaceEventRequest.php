@@ -11,7 +11,7 @@ class UpdatePlaceEventRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class UpdatePlaceEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'place_id' => 'required|exists:places,id',
+            'images' => 'array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif',
+            'deleted_images' => 'array|nullable',
+            'deleted_images.*' => 'integer|exists:images,id',
         ];
     }
 }

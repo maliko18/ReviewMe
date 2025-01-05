@@ -21,7 +21,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
+        $this->call(CountrySeeder::class);
         $this->call(RolesAndPermissionsSeeder::class);
+        $this->call(CategorySeeder::class);
+
         // User::factory(10)->withPersonalTeam()->create();
 
         $user =User::factory()->withPersonalTeam()->create([
@@ -68,7 +71,6 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create()->each(function ($user) {
             $user->assignRole(['user', 'place-admin'][rand(0, 1)]);
         });
-        $this->call(CountrySeeder::class);
         $this->call(PlaceSeeder::class);
 
     }

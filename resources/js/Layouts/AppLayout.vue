@@ -6,7 +6,7 @@ import {
     HomeIcon, MapPinIcon, CalendarIcon, StarIcon, TagIcon,
     Settings2Icon, UserIcon, MenuIcon, XIcon, BellIcon,
     LayoutDashboardIcon, ImageIcon,
-} from 'lucide-react';
+} from 'lucide-vue-next';
 import Dropdown from '@/Components/Dropdown.vue';
 import FlashMessage from '@/Components/FlashMessage.vue';
 import DropdownLink from "@/Components/DropdownLink.vue";
@@ -15,7 +15,7 @@ const showingSidebar = ref(false);
 const { auth, can } = usePage().props;
 
 const navigation = computed(() => [
-    { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboardIcon, can: true },
+    { name: 'Dashboard', href: route('admin.dashboard'), icon: LayoutDashboardIcon, can: true },
     { name: 'Places', href: route('admin.places.index'), icon: MapPinIcon, can: can.create_places },
     { name: 'Categories', href: route('admin.categories.index'), icon: TagIcon, can: can.manage_categories },
     { name: 'Events', href: route('admin.events.index'), icon: CalendarIcon, can: can.manage_events },

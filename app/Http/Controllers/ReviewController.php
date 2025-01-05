@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Place;
 use App\Models\Review;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -65,18 +66,15 @@ class ReviewController extends Controller
             ->with('success', 'Review updated successfully');
     }
 
-    public function store(Request $request)
+    public function store(Place $place, Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'body' => 'required|string',
             'rating' => 'required|integer|between:1,5',
-            'place_id' => 'required|exists:places,id',
-            'parent_id' => 'nullable|exists:reviews,id',
             'meta' => 'nullable|json',
             'images.*' => 'image|max:2048'
         ]);
-
-        $review = Review::create([
+        $review=$place->reviews()->create([
             ...$validated,
             'user_id' => auth()->id()
         ]);
@@ -88,8 +86,8 @@ class ReviewController extends Controller
             }
         }
 
-        return redirect()->back()
-            ->with('success', 'Review submitted successfully');
+        return redirect()->route('places.show', $place->id)
+            ->with('success', 'Place deleted successfully.');
     }
 
     public function destroy(Review $review)

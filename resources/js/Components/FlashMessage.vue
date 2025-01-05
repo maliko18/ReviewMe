@@ -1,7 +1,7 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
-import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
+import { CheckCircleIcon, XCircleIcon } from 'lucide-vue-next';
 
 const show = ref(false);
 const message = ref('');

@@ -2,7 +2,11 @@
 
 namespace App\Services;
 
+use App\Http\Requests\PlaceEvent\StorePlaceEventRequest;
+use App\Http\Requests\PlaceEvent\UpdatePlaceEventRequest;
 use App\Models\PlaceEvent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class PlaceEventService
@@ -18,16 +22,6 @@ class PlaceEventService
             ->allowedFilters([
                 'place_id',
                 'status',
-                'search' => function ($query, $value) {
-                    $query->where(function ($query) use ($value) {
-                        $query->where('name', 'like', "%{$value}%")
-                            ->orWhere('description', 'like', "%{$value}%")
-                            ->orWhereHas('place', function ($query) use ($value) {
-                                $query->where('name', 'like', "%{$value}%");
-                            });
-                    });
-                },
-                'date_range',
             ])
             ->allowedSorts(['start_date', 'end_date', 'created_at'])
             ->defaultSort('-start_date')
@@ -42,32 +36,69 @@ class PlaceEventService
      * @param array $data
      * @return PlaceEvent
      */
-    public function storeEvent(array $data): PlaceEvent
+    public function storeEvent(StorePlaceEventRequest $request): PlaceEvent
     {
-        return PlaceEvent::create($data);
+        return DB::transaction(function () use ($request) {
+            $event = PlaceEvent::create($request->validated());
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('events', 'public');
+                    $event->images()->create([
+                        'path' => $path,
+                      /*  'meta' => [
+                            'original_name' => $image->getClientOriginalName(),
+                            'size' => $image->getSize(),
+                            'mime' => $image->getMimeType()
+                        ]*/
+                    ]);
+                }
+            }
+            return $event;
+        });
     }
 
-    /**
-     * Update an existing place event.
-     *
-     * @param PlaceEvent $event
-     * @param array $data
-     * @return PlaceEvent
-     */
-    public function updateEvent(PlaceEvent $event, array $data): PlaceEvent
+    public function updateEvent(PlaceEvent $event, UpdatePlaceEventRequest $request): PlaceEvent
     {
-        $event->update($data);
-        return $event;
+        return DB::transaction(function () use ($event, $request) {
+            $validated = $request->validated();
+            $event->update($validated);
+
+            if (!empty($validated['deleted_images'])) {
+                $deletedImages = $event->images()->whereIn('id', $validated['deleted_images'])->get();
+
+                foreach ($deletedImages as $image) {
+                    Storage::disk('public')->delete($image->path);
+                    $image->delete();
+                }
+            }
+
+            // Handle new images
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('events', 'public');
+                    $event->images()->create([
+                        'path' => $path,
+                       /* 'meta' => [
+                            'original_name' => $image->getClientOriginalName(),
+                            'size' => $image->getSize(),
+                            'mime' => $image->getMimeType()
+                        ]*/
+                    ]);
+                }
+            }
+            return $event;
+        });
     }
 
     /**
      * Delete a place event.
      *
      * @param PlaceEvent $event
-     * @return void
+     * @return bool
      */
-    public function deleteEvent(PlaceEvent $event): void
+
+    public function deleteEvent(PlaceEvent $event):bool
     {
-        $event->delete();
+        return $event->delete();
     }
 }

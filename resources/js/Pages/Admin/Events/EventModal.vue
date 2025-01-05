@@ -1,13 +1,14 @@
+# EventForm.vue
 <script setup>
-import { onMounted } from 'vue';
-import { useForm } from '@inertiajs/vue3';
+import {onMounted, ref, watch} from 'vue';
+import {useForm} from '@inertiajs/vue3';
 import Modal from '@/Components/Modal.vue';
 import TextInput from '@/Components/TextInput.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import InputError from '@/Components/InputError.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
-import { Switch } from '@headlessui/vue';
+import {Switch} from '@headlessui/vue';
 
 const props = defineProps({
     modelValue: Boolean,
@@ -22,6 +23,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['update:modelValue', 'close']);
+const previewImages = ref([]);
+const imageInput = ref(null);
+const deletingImages = ref([]);
 
 const form = useForm({
     name: '',
@@ -30,10 +34,24 @@ const form = useForm({
     end_date: '',
     status: true,
     place_id: '',
-    meta: {}
+    meta: {},
+    images: [],
+    deleted_images: []
 });
 
 onMounted(() => {
+    resetForm();
+});
+
+watch(() => props.event, () => {
+    resetForm();
+});
+
+const resetForm = () => {
+    previewImages.value = [];
+    deletingImages.value = [];
+    form.reset();
+
     if (props.event) {
         form.name = props.event.name;
         form.description = props.event.description;
@@ -42,43 +60,85 @@ onMounted(() => {
         form.status = props.event.status;
         form.place_id = props.event.place_id;
         form.meta = props.event.meta || {};
+
+        if (props.event.images) {
+            previewImages.value = props.event.images.map(img => ({
+                id: img.id,
+                url: img.path,
+                existing: true
+            }));
+        }
     }
-});
+};
+
+const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files);
+    form.images = [...form.images, ...files];
+
+    files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImages.value.push({
+                url: e.target.result,
+                file,
+                existing: false
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Clear input
+    e.target.value = '';
+};
+
+const removeImage = (index) => {
+    const image = previewImages.value[index];
+
+    if (image.existing) {
+        deletingImages.value.push(image.id);
+        form.deleted_images.push(image.id);
+    }
+
+    previewImages.value.splice(index, 1);
+    if (form.images[index]) {
+        form.images.splice(index, 1);
+    }
+};
 
 const submit = () => {
     if (props.event) {
-        form.put(route('admin.events.update', props.event.id), {
+        form.post(route('admin.events.update', props.event.id), {
             onSuccess: () => {
                 emit('close');
-                form.reset();
-            }
+                resetForm();
+            },
+            preserveScroll: true,
+            forceFormData: true
         });
     } else {
         form.post(route('admin.events.store'), {
             onSuccess: () => {
                 emit('close');
-                form.reset();
-            }
+                resetForm();
+            },
+            preserveScroll: true,
+            forceFormData: true
         });
     }
 };
 </script>
 
 <template>
-    <Modal
-        :show="modelValue"
-        @close="$emit('update:modelValue', false)"
-        :maxWidth="'2xl'"
-    >
+    <Modal :show="modelValue" @close="$emit('update:modelValue', false)" :maxWidth="'2xl'">
         <div class="p-6">
             <h2 class="text-lg font-medium text-gray-900">
                 {{ event ? 'Edit Event' : 'Create New Event' }}
             </h2>
 
-            <form @submit.prevent="submit" class="mt-6 space-y-6">
+            <form @submit.prevent="submit" class="mt-6">
                 <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     <!-- Event Name -->
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-6">
                         <InputLabel for="name" value="Event Name"/>
                         <TextInput
                             id="name"
@@ -91,7 +151,7 @@ const submit = () => {
                     </div>
 
                     <!-- Place Selection -->
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-6">
                         <InputLabel for="place_id" value="Place"/>
                         <select
                             id="place_id"
@@ -165,10 +225,57 @@ const submit = () => {
                             {{ form.status ? 'Active' : 'Inactive' }}
                         </span>
                     </div>
+
+                    <!-- Image Upload -->
+                    <div class="sm:col-span-6">
+                        <InputLabel value="Event Images"/>
+                        <div
+                            class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
+                            <div class="text-center">
+                                <div class="mt-4 flex text-sm leading-6 text-gray-600">
+                                    <label
+                                        class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600">
+                                        <span>Upload images</span>
+                                        <input
+                                            ref="imageInput"
+                                            type="file"
+                                            multiple
+                                            accept="image/*"
+                                            class="sr-only"
+                                            @change="handleImageUpload"
+                                        >
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <InputError :message="form.errors.images" class="mt-2"/>
+
+                        <!-- Image Previews -->
+                        <div v-if="previewImages.length" class="mt-4 grid grid-cols-4 gap-4">
+                            <div v-for="(image, index) in previewImages"
+                                 :key="index"
+                                 class="relative"
+                                 :class="{ 'opacity-50': deletingImages.includes(image.id) }"
+                            >
+                                <img :src="image.url"
+                                     class="h-24 w-24 object-cover rounded-lg">
+                                <button
+                                    @click.prevent="removeImage(index)"
+                                    class="absolute -top-2 -right-2 rounded-full bg-red-500 text-white p-1"
+                                    :disabled="form.processing"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-6 flex items-center justify-end gap-x-4">
-                    <SecondaryButton @click="$emit('close')" type="button">
+                    <SecondaryButton @click="$emit('close')" type="button" :disabled="form.processing">
                         Cancel
                     </SecondaryButton>
                     <PrimaryButton :disabled="form.processing">

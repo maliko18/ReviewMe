@@ -2,7 +2,7 @@
 import {ref, watch} from 'vue';
 import {router} from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
-import {SearchIcon, XIcon} from 'lucide-react';
+import {SearchIcon, XIcon} from 'lucide-vue-next';
 
 const props = defineProps({
     modelValue: String,
