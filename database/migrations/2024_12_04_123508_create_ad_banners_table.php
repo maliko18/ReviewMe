@@ -14,7 +14,7 @@ return new class extends Migration {
         Schema::create('ad_banners', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->boolean('status')->default(1);
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();

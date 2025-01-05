@@ -26,8 +26,11 @@ class AdminPlaceController extends Controller
     {
         $places = $this->placeService->getPlacesWithFilters();
 
-        return Inertia::render('Places/Index', [
+        return Inertia::render('Admin/Places/Index', [
             'places' => $places,
+            'categories' => Category::all(),
+            'cities' => City::all(),
+            'countries' => Country::all(),
         ]);
     }
 

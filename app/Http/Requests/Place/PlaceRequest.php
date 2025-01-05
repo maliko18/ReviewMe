@@ -25,7 +25,7 @@ class PlaceRequest extends FormRequest
             'address.city_id' => ['required', 'exists:cities,id'],
             'address.country_id' => ['required', 'exists:countries,id'],
             'address.coordinates' => ['nullable', 'array'],
-            'images.*' => ['image', 'max:2048'],
+            'images.*' => ['image'],
             'deleted_images' => ['nullable', 'array'],
             'deleted_images.*' => ['exists:images,id']
         ];

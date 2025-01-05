@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
-import { UserIcon, MenuIcon, XIcon } from 'lucide-react';
+import { UserIcon, MenuIcon, XIcon } from 'lucide-vue-next';
 
 defineProps({
     auth: Object,

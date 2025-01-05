@@ -16,9 +16,9 @@ class CategoryService
     public function getCategories()
     {
         return QueryBuilder::for(Category::class)
-            ->allowedFilters([
+          /*  ->allowedFilters([
                 'search' => fn($query, $value) => $query->where('name', 'like', "%{$value}%"),
-            ])
+            ])*/
             ->withCount('places')
             ->paginate()
             ->withQueryString();

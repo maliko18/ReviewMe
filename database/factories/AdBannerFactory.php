@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Place;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,12 @@ class AdBannerFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => $this->faker->text(50),
+            'description' => $this->faker->text(200),
+            'start_date' => $this->faker->dateTimeBetween('-1 month', '+1 month'),
+            'end_date' => $this->faker->dateTimeBetween('+1 month', '+2 month'),
+            'place_id' => Place::factory(),
+          /*  'status' => $this->faker->randomElement(['active', 'inactive']),*/
         ];
     }
 }

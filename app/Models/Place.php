@@ -75,5 +75,10 @@ class Place extends Model
         return $this->belongsToMany(User::class);
     }
 
+    public function calculateAverageRating(): float
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
 
 }

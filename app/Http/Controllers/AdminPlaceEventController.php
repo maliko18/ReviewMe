@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PlaceEvent\StorePlaceEventRequest;
 use App\Http\Requests\PlaceEvent\UpdatePlaceEventRequest;
-use App\Http\Requests\StorePlaceEventRequest;
 use App\Models\Place;
 use App\Models\PlaceEvent;
 use App\Services\PlaceEventService;
@@ -31,18 +31,17 @@ class AdminPlaceEventController extends Controller
         ]);
     }
 
-    public function store(StorePlaceEventRequest $request)
+    public function store(StorePlaceEventRequest $request): RedirectResponse
     {
-        $this->placeEventService->storeEvent($request->validated());
+        $this->placeEventService->storeEvent($request);
 
         return redirect()->route('admin.events.index')
             ->with('success', 'Event created successfully.');
     }
 
-    public function update(UpdatePlaceEventRequest $request, PlaceEvent $event)
+    public function update(UpdatePlaceEventRequest $request, PlaceEvent $event): RedirectResponse
     {
-        $this->placeEventService->updateEvent($event, $request->validated());
-
+        $this->placeEventService->updateEvent($event, $request);
         return redirect()->route('admin.events.index')
             ->with('success', 'Event updated successfully.');
     }
