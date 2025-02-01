@@ -1,66 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# ReviewMe
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+**ReviewMe** is a worldwide place review application. It allows users to search for and discover places to eat, walk, engage in sports, and much more. Users can share their experiences by reviewing these places, helping others make informed decisions.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Collaborators
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **NOURINE Abdelmalek**
+    - **Email**: nourinemalek01@gmail.com
+    - **GitHub**: [github.com/maliko18](https://github.com/maliko18)
 
-## Learning Laravel
+- **Souhila BENACHOUR**
+    - **Email**: souhila.benachour@etudiant.univ-lr.fr
+    - **GitHub**: [github.com/SouhilaBENACHOUR](https://github.com/SouhilaBENACHOUR)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **HADDADO Lina**
+    - **Email**: lina.haddado@etudiant.univ-lr.fr
+    - **GitHub**: [github.com/Lina-Hadd](https://github.com/Lina-Hadd)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Nesrine REKAI**
+    - **Email**: nesrine.rekai@etudiant.univ-lr.fr
+    - **GitHub**: [github.com/NesrineREKAI](https://github.com/https://github.com/NesrineREKAI)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **GOUIRAH Farid**
+    - **Email**: farid.gouirah@etudiant.univ-lr.fr
+    - **GitHub**: [github.com/GouirahFarid](https://github.com/GouirahFarid)
 
-## Laravel Sponsors
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Features
 
-### Premium Partners
+- Search for places based on activity (eating, walking, sports, etc.)
+- Review and rate places
+- Server-side routing with Laravel
+- Reactive UI powered by Vue 3
+- Single-page application (SPA) experience using Inertia.js
+- TailwindCSS for modern styling
+- Easy-to-configure and extend architecture
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Requirements
+
+- PHP >= 8.1
+- Composer
+- Node.js >= 16.x
+- npm or Yarn
+- MySQL or any supported database
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:GouirahFarid/review-me.git
+   cd review-me
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. Configure the environment:
+
+   Copy the `.env.example` file to `.env` and update the database and other configuration variables:
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Migrate and seed the database:
+
+   Before running the migration command, ensure that the application is connected to the database by verifying the `.env` file configuration.
+
+   Run the following command to refresh and seed the database:
+
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
+   **Note**: Running the seeder is mandatory.
+
+5. Build assets (optional for local development):
+
+   ```bash
+   npm run dev
+   ```
+
+6. Start the development server:
+
+   ```bash
+   php artisan serve
+   ```
+
+   The application should now be running at `http://localhost:8000`.
+
+## Default User Login
+
+- **Email**: `super@admin.com`
+- **Password**: `password`
+
+## Project Structure
+
+- **Backend**: Laravel handles the server-side logic, routes, and database interactions.
+- **Frontend**: Vue 3 provides the reactive user interface.
+- **Inertia.js**: Bridges the backend and frontend, allowing seamless communication without traditional API endpoints.
+
+## Usage
+## Routes
+
+- `/` : Home page
+- `/login` : Login page
+- `/register` : Register page
+- `/places` : List places page
+- `/places/{place_id}` : Place details page
+- `/admin` : Admin dashboard
+
+### Running in Development
+
+- Watch for frontend changes:
+
+  ```bash
+  npm run watch
+  ```
+
+### Production Build
+
+1. Build the frontend assets:
+
+   ```bash
+   npm run build
+   ```
+
+2. Serve the application:
+
+   ```bash
+   php artisan serve --env=production
+   ```
+
+
+
+  ```
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions are welcome! Please fork the repository and submit a pull request with your improvements.
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
